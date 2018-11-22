@@ -16,10 +16,12 @@ namespace JsonWebTokenWebApi.Handlers
 		// Using an example system to verify login details and create tokens
 		private IUserManagement userManagement = UserManagement.Instance;
 
-		protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+		protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
 		{
 			// Used to send a custom error to the client
 			HttpResponseMessage message = null;
+			TokenValidationResult validationResult = null;
+			string refreshedToken = null;
 
 			// Get the token from the Authorization header
 			string token = GetTokenFromHeaders(request);
@@ -29,11 +31,14 @@ namespace JsonWebTokenWebApi.Handlers
 				try
 				{
 					// Validate the token, getting a ClaimsPrinciple
-					var principle = userManagement.ValidateSecurityToken(token);
+					validationResult = userManagement.ValidateSecurityToken(token);
+
+					// If the lifetime is close to ending, extend the expiry
+					userManagement.TryRefreshingSecurityTokenLifetime(validationResult.ValidatedToken, out refreshedToken);
 
 					// If successful, set the principle to be used by the request handlers
-					Thread.CurrentPrincipal = principle;
-					HttpContext.Current.User = principle;
+					Thread.CurrentPrincipal = validationResult.Principle;
+					HttpContext.Current.User = validationResult.Principle;
 				}
 				catch (SecurityTokenValidationException secEx)
 				{
@@ -42,9 +47,20 @@ namespace JsonWebTokenWebApi.Handlers
 				}
 			}
 
-			// Return the custom error message, or handle the request
-			if (message != null) return Task<HttpResponseMessage>.Factory.StartNew(() => message);
-			else return base.SendAsync(request, cancellationToken);
+			// Handle the request if error response is empty
+			if (message == null)
+			{
+				message = await base.SendAsync(request, cancellationToken);
+			}
+
+			// Add sliding session token to header
+			if (refreshedToken != null)
+			{
+				message.Headers.Add("Authorization", "Bearer " + refreshedToken);
+			}
+
+			// Return response
+			return message;
 		}
 
 		private string GetTokenFromHeaders(HttpRequestMessage request)

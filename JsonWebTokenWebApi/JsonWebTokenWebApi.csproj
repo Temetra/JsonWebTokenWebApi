@@ -105,6 +105,7 @@
     <Compile Include="Identity\IUserManagement.cs" />
     <Compile Include="Identity\UserDetails.cs" />
     <Compile Include="Identity\UserManagement.cs" />
+    <Compile Include="Identity\TokenValidationResult.cs" />
     <Compile Include="Models\LoginRequest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

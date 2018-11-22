@@ -1,4 +1,4 @@
-﻿using System.Security.Claims;
+﻿using System.IdentityModel.Tokens.Jwt;
 
 namespace JsonWebTokenWebApi.Identity
 {
@@ -6,6 +6,7 @@ namespace JsonWebTokenWebApi.Identity
 	{
 		UserDetails GetUserDetails(string identity, string secret);
 		string CreateSecurityToken(UserDetails userDetails);
-		ClaimsPrincipal ValidateSecurityToken(string token);
+		bool TryRefreshingSecurityTokenLifetime(JwtSecurityToken originalToken, out string refreshedToken);
+		TokenValidationResult ValidateSecurityToken(string token);
 	}
 }
