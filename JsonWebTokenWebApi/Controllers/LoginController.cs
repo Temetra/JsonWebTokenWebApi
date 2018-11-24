@@ -14,6 +14,7 @@ namespace JsonWebTokenWebApi.Controllers
 		[HttpPost]
 		public IHttpActionResult Authenticate([FromBody] LoginRequest loginRequest)
 		{
+			HttpResponseMessage message;
 			UserDetails userDetails = null;
 
 			// Use system to check provided login details
@@ -27,14 +28,16 @@ namespace JsonWebTokenWebApi.Controllers
 			// Return token or refuse access
 			if (userDetails != null)
 			{
-				string token = userManagement.CreateSecurityToken(userDetails);
-				return Ok(new { token });
+				TokenResult tokenResult = userManagement.CreateSecurityToken(userDetails);
+				message = Request.CreateResponse(HttpStatusCode.OK, new { tokenResult.Token });
+				message.Headers.Add("Set-Cookie", tokenResult.Cookie);
 			}
 			else
 			{
-				HttpResponseMessage message = new HttpResponseMessage(HttpStatusCode.Unauthorized);
-				return ResponseMessage(message);
+				message = new HttpResponseMessage(HttpStatusCode.Unauthorized);
 			}
+
+			return ResponseMessage(message);
 		}
 	}
 }
