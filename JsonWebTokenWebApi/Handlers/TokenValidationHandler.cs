@@ -21,7 +21,6 @@ namespace JsonWebTokenWebApi.Handlers
 			// Used to send a custom error to the client
 			HttpResponseMessage message = null;
 			TokenValidationResult validationResult = null;
-			string refreshedToken = null;
 
 			// Get the token from the Authorization header
 			string token = GetTokenFromHeaders(request);
@@ -32,9 +31,6 @@ namespace JsonWebTokenWebApi.Handlers
 				{
 					// Validate the token, getting a ClaimsPrinciple
 					validationResult = userManagement.ValidateSecurityToken(token);
-
-					// If the lifetime is close to ending, extend the expiry
-					userManagement.TryRefreshingSecurityTokenLifetime(validationResult.ValidatedToken, out refreshedToken);
 
 					// If successful, set the principle to be used by the request handlers
 					Thread.CurrentPrincipal = validationResult.Principle;
@@ -51,12 +47,6 @@ namespace JsonWebTokenWebApi.Handlers
 			if (message == null)
 			{
 				message = await base.SendAsync(request, cancellationToken);
-			}
-
-			// Add sliding session token to header
-			if (refreshedToken != null)
-			{
-				message.Headers.Add("Authorization", "Bearer " + refreshedToken);
 			}
 
 			// Return response

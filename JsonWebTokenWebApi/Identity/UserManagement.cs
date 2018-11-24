@@ -86,41 +86,6 @@ namespace JsonWebTokenWebApi.Identity
 			return tokenHandler.WriteToken(token);
 		}
 
-		// Extends the lifetime of a given token
-		public bool TryRefreshingSecurityTokenLifetime(JwtSecurityToken originalToken, out string refreshedToken)
-		{
-			// If the lifetime is still within the threshold return null
-			if (originalToken.ValidTo.Subtract(DateTime.UtcNow).TotalMinutes > GetLifetimeRefreshThreshold())
-			{
-				refreshedToken = null;
-				return false;
-			}
-
-			// Replicate the claims identity
-			ClaimsIdentity claimsIdentity = new ClaimsIdentity(new[]
-			{
-				originalToken.Claims.First(claim => claim.Type == JwtRegisteredClaimNames.UniqueName)
-			});
-
-			// Token lifetime
-			var issueDate = originalToken.ValidFrom;
-			var expiryDate = DateTime.UtcNow.AddMinutes(GetTokenLifetime());
-
-			// Create token
-			JwtSecurityToken token = tokenHandler.CreateJwtSecurityToken(
-				issuer: originalToken.Issuer,
-				audience: originalToken.Audiences.First(),
-				subject: claimsIdentity,
-				notBefore: issueDate,
-				expires: expiryDate,
-				issuedAt: issueDate,
-				signingCredentials: GetSigningCredentials()
-				);
-
-			refreshedToken = tokenHandler.WriteToken(token);
-			return true;
-		}
-
 		// Validates a JSON Web Token
 		// Returns a ClaimsPrincipal or throws an exception
 		public TokenValidationResult ValidateSecurityToken(string token)
