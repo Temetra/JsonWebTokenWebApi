@@ -103,6 +103,7 @@
     </Compile>
     <Compile Include="Handlers\TokenValidationHandler.cs" />
     <Compile Include="Identity\IUserManagement.cs" />
+    <Compile Include="Identity\JsonWebTokenProvider.cs" />
     <Compile Include="Identity\UserDetails.cs" />
     <Compile Include="Identity\UserManagement.cs" />
     <Compile Include="Identity\TokenValidationResult.cs" />

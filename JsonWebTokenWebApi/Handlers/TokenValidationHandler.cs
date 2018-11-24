@@ -41,6 +41,10 @@ namespace JsonWebTokenWebApi.Handlers
 					// An unhandled SecurityTokenValidationException results in HTTP 500
 					message = request.CreateResponse(HttpStatusCode.Unauthorized, new { secEx.Message });
 				}
+				catch (ArgumentException argEx)
+				{
+					message = request.CreateResponse(HttpStatusCode.Unauthorized, new { argEx.Message });
+				}
 			}
 
 			// Handle the request if error response is empty
