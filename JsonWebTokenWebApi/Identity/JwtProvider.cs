@@ -7,12 +7,12 @@ using System.Text;
 
 namespace JsonWebTokenWebApi.Identity
 {
-	public class JsonWebTokenProvider
+	public class JwtProvider
 	{
 		// JWT token handler
 		private JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
 
-		public JsonWebTokenProvider(string issuer, IEnumerable<string> audiences, double tokenLifetime, string signingKey)
+		public JwtProvider(string issuer, IEnumerable<string> audiences, double tokenLifetime, string signingKey)
 		{
 			Issuer = issuer;
 			Audiences = audiences;
@@ -63,7 +63,7 @@ namespace JsonWebTokenWebApi.Identity
 
 		// Validates a JSON Web Token
 		// Returns a ClaimsPrincipal or throws an exception
-		public TokenValidationResult ValidateSecurityToken(string token)
+		public ClaimsPrincipal ValidateSecurityToken(string token, out JwtSecurityToken validatedToken)
 		{
 			// Other claims
 			var issuer = Issuer;
@@ -83,10 +83,11 @@ namespace JsonWebTokenWebApi.Identity
 			};
 
 			// Validate token
-			ClaimsPrincipal principle = tokenHandler.ValidateToken(token, validationParameters, out SecurityToken validatedToken);
+			ClaimsPrincipal principle = tokenHandler.ValidateToken(token, validationParameters, out SecurityToken validatedSecurityToken);
 
 			// Return result
-			return new TokenValidationResult { Principle = principle, ValidatedToken = validatedToken as JwtSecurityToken };
+			validatedToken = validatedSecurityToken as JwtSecurityToken;
+			return principle;
 		}
 	}
 }
