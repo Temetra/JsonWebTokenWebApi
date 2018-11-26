@@ -6,8 +6,6 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Security.Claims;
-using System.Threading;
-using System.Web;
 
 namespace JsonWebTokenWebApi.Identity
 {
@@ -77,22 +75,18 @@ namespace JsonWebTokenWebApi.Identity
 		}
 
 		// If a token and cookie are provided an attempt to authorize is made
-		public void ProcessAuthorizationRequest(HttpRequestMessage request)
+		public ClaimsPrincipal ProcessAuthorizationRequest(HttpRequestMessage request)
 		{
 			// Get token from headers
 			string token = GetTokenFromHeaders(request);
-			if (string.IsNullOrEmpty(token)) return;
+			if (string.IsNullOrEmpty(token)) return null;
 
 			// Get cookie from headers
 			string cookie = GetCookieFromHeaders(request);
-			if (string.IsNullOrEmpty(cookie)) return;
+			if (string.IsNullOrEmpty(cookie)) return null;
 
 			// Validate the token, getting a ClaimsPrinciple
-			ClaimsPrincipal principle = TokenProvider.ValidateSecurityToken(token, cookie);
-
-			// Set IPrinciple, which is used by subsequent authorization filters
-			Thread.CurrentPrincipal = principle;
-			HttpContext.Current.User = principle;
+			return TokenProvider.ValidateSecurityToken(token, cookie);
 		}
 
 		private string GetTokenFromHeaders(HttpRequestMessage request)
