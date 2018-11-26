@@ -47,10 +47,10 @@ namespace JsonWebTokenWebApi.Identity
 			};
 		}
 
-		public TokenValidationResult ValidateSecurityToken(TokenInformation tokenInfo)
+		public TokenValidationResult ValidateSecurityToken(string token, string cookie)
 		{
 			// Validate token
-			TokenValidationResult tokenResult = JwtProvider.ValidateSecurityToken(tokenInfo.Token);
+			TokenValidationResult tokenResult = JwtProvider.ValidateSecurityToken(token);
 
 			// Validate user context
 			if (tokenResult.ValidatedToken.Payload.TryGetValue("usr_ctx", out object tokenValue))
@@ -59,7 +59,7 @@ namespace JsonWebTokenWebApi.Identity
 				byte[] tokenHashed = Convert.FromBase64String(Convert.ToString(tokenValue));
 
 				// Compute hash for cookie value
-				byte[] cookieHashed = HashingAlgo.ComputeHash(Convert.FromBase64String(tokenInfo.Cookie));
+				byte[] cookieHashed = HashingAlgo.ComputeHash(Convert.FromBase64String(cookie));
 
 				// Compare bytes
 				if (tokenHashed.SequenceEqual(cookieHashed))

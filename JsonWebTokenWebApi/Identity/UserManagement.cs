@@ -24,28 +24,38 @@ namespace JsonWebTokenWebApi.Identity
 			);
 
 		// Placeholder for database lookup
-		public UserDetails GetUserDetails(string identity, string secret)
+		private UserDetails GetUserDetails(string identity, string secret)
 		{
 			if (identity == "admin" && secret == "secret_code") return new UserDetails { Name = "admin" };
 			else return null;
 		}
 
 		// Creates a JSON Web Token
-		public TokenInformation CreateSecurityToken(UserDetails userDetails)
+		public TokenInformation CreateSecurityToken(string identity, string secret)
 		{
-			var claims = new List<Claim>
-			{
-				new Claim(JwtRegisteredClaimNames.UniqueName, userDetails.Name),
-				new Claim(JwtRegisteredClaimNames.Aud, "SampleVisitor")
-			};
+			// Use system to check provided login details
+			var userDetails = GetUserDetails(identity, secret);
 
-			return tokenProvider.CreateSecurityToken(claims);
+			// Return token if user details were found
+			if (userDetails != null)
+			{
+				List<Claim> claims = new List<Claim>
+				{
+					new Claim(JwtRegisteredClaimNames.UniqueName, userDetails.Name),
+					new Claim(JwtRegisteredClaimNames.Aud, "SampleVisitor")
+				};
+
+				return tokenProvider.CreateSecurityToken(claims);
+			}
+
+			// Return nothing on failure
+			return null;
 		}
 
 		// Validate JSON Web Token
-		public TokenValidationResult ValidateSecurityToken(TokenInformation tokenInfo)
+		public TokenValidationResult ValidateSecurityToken(string token, string cookie)
 		{
-			return tokenProvider.ValidateSecurityToken(tokenInfo);
+			return tokenProvider.ValidateSecurityToken(token, cookie);
 		}
 	}
 }

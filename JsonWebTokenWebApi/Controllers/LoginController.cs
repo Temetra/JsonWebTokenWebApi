@@ -15,28 +15,22 @@ namespace JsonWebTokenWebApi.Controllers
 		[HttpPost]
 		public IHttpActionResult Authenticate([FromBody] LoginRequest loginRequest)
 		{
+			// Response message
 			HttpResponseMessage message;
-			UserDetails userDetails = null;
 
-			// Use system to check provided login details
-			if (loginRequest != null)
-			{
-				userDetails = userManagement.GetUserDetails(
-					identity: loginRequest.Identity,
-					secret: loginRequest.Secret);
-			}
+			// Attempt to create token for provided credentials
+			TokenInformation tokenResult = userManagement.CreateSecurityToken(
+				identity: loginRequest.Identity,
+				secret: loginRequest.Secret);
 
 			// Return token or refuse access
-			if (userDetails != null)
+			if (tokenResult != null)
 			{
-				// Create token
-				TokenInformation tokenResult = userManagement.CreateSecurityToken(userDetails);
-
 				// Create response with token as body
 				message = Request.CreateResponse(HttpStatusCode.OK, new { tokenResult.Token });
 
 				// Set secure cookie
-				var cookie = new CookieHeaderValue("__Secure-usr_ctx", tokenResult.Cookie);
+				CookieHeaderValue cookie = new CookieHeaderValue("__Secure-usr_ctx", tokenResult.Cookie);
 				cookie.Secure = true;
 				cookie.HttpOnly = true;
 				cookie.MaxAge = System.TimeSpan.FromMinutes(10);
@@ -47,6 +41,7 @@ namespace JsonWebTokenWebApi.Controllers
 				message = new HttpResponseMessage(HttpStatusCode.Unauthorized);
 			}
 
+			// Return response
 			return ResponseMessage(message);
 		}
 	}

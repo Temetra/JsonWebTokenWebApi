@@ -31,15 +31,8 @@ namespace JsonWebTokenWebApi.Handlers
 			{
 				try
 				{
-					// Create token info
-					TokenInformation tokenInfo = new TokenInformation
-					{
-						Token = token,
-						Cookie = cookie
-					};
-
 					// Validate the token, getting a ClaimsPrinciple
-					validationResult = userManagement.ValidateSecurityToken(tokenInfo);
+					validationResult = userManagement.ValidateSecurityToken(token, cookie);
 
 					// If successful, set the principle to be used by the request handlers
 					Thread.CurrentPrincipal = validationResult.Principle;

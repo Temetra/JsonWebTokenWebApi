@@ -4,8 +4,7 @@ namespace JsonWebTokenWebApi.Identity
 {
 	public interface IUserManagement
 	{
-		UserDetails GetUserDetails(string identity, string secret);
-		TokenInformation CreateSecurityToken(UserDetails userDetails);
-		TokenValidationResult ValidateSecurityToken(TokenInformation tokenInfo);
+		TokenInformation CreateSecurityToken(string identity, string secret);
+		TokenValidationResult ValidateSecurityToken(string token, string cookie);
 	}
 }
