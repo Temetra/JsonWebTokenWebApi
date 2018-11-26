@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 using JsonWebTokenWebApi.Identity;
+using System.Net.Http.Headers;
 
 namespace JsonWebTokenWebApi.Handlers
 {
@@ -22,15 +23,23 @@ namespace JsonWebTokenWebApi.Handlers
 			HttpResponseMessage message = null;
 			TokenValidationResult validationResult = null;
 
-			// Get the token from the Authorization header
+			// Get token and cookie from headers
 			string token = GetTokenFromHeaders(request);
+			string cookie = GetCookieFromHeaders(request);
 
-			if (string.IsNullOrEmpty(token) == false)
+			if (string.IsNullOrEmpty(token) == false && string.IsNullOrEmpty(cookie) == false)
 			{
 				try
 				{
+					// Create token info
+					TokenInformation tokenInfo = new TokenInformation
+					{
+						Token = token,
+						Cookie = cookie
+					};
+
 					// Validate the token, getting a ClaimsPrinciple
-					validationResult = userManagement.ValidateSecurityToken(token);
+					validationResult = userManagement.ValidateSecurityToken(tokenInfo);
 
 					// If successful, set the principle to be used by the request handlers
 					Thread.CurrentPrincipal = validationResult.Principle;
@@ -75,6 +84,13 @@ namespace JsonWebTokenWebApi.Handlers
 			}
 
 			return null;
+		}
+
+		private string GetCookieFromHeaders(HttpRequestMessage request)
+		{
+			CookieHeaderValue cookie = request.Headers.GetCookies("__Secure-usr_ctx").FirstOrDefault();
+			if (cookie != null) return cookie["__Secure-usr_ctx"].Value;
+			else return null;
 		}
 	}
 }

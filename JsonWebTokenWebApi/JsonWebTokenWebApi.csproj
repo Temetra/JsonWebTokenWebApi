@@ -102,11 +102,10 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Handlers\TokenValidationHandler.cs" />
+    <Compile Include="Identity\ContextualJWTProvider.cs" />
     <Compile Include="Identity\IUserManagement.cs" />
     <Compile Include="Identity\JsonWebTokenProvider.cs" />
-    <Compile Include="Identity\TokenResult.cs" />
-    <Compile Include="Identity\UserContext.cs" />
-    <Compile Include="Identity\UserContextProvider.cs" />
+    <Compile Include="Identity\TokenInformation.cs" />
     <Compile Include="Identity\UserDetails.cs" />
     <Compile Include="Identity\UserManagement.cs" />
     <Compile Include="Identity\TokenValidationResult.cs" />

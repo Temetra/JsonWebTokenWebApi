@@ -3,6 +3,7 @@ using System.Net.Http;
 using System.Web.Http;
 using JsonWebTokenWebApi.Models;
 using JsonWebTokenWebApi.Identity;
+using System.Net.Http.Headers;
 
 namespace JsonWebTokenWebApi.Controllers
 {
@@ -28,9 +29,18 @@ namespace JsonWebTokenWebApi.Controllers
 			// Return token or refuse access
 			if (userDetails != null)
 			{
-				TokenResult tokenResult = userManagement.CreateSecurityToken(userDetails);
+				// Create token
+				TokenInformation tokenResult = userManagement.CreateSecurityToken(userDetails);
+
+				// Create response with token as body
 				message = Request.CreateResponse(HttpStatusCode.OK, new { tokenResult.Token });
-				message.Headers.Add("Set-Cookie", tokenResult.Cookie);
+
+				// Set secure cookie
+				var cookie = new CookieHeaderValue("__Secure-usr_ctx", tokenResult.Cookie);
+				cookie.Secure = true;
+				cookie.HttpOnly = true;
+				cookie.MaxAge = System.TimeSpan.FromMinutes(10);
+				message.Headers.AddCookies(new[] { cookie });
 			}
 			else
 			{
