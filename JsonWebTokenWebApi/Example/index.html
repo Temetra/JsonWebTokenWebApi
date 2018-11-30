@@ -1,0 +1,35 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<title>JWT example</title>
+	<link rel="stylesheet" type="text/css" href="example.css">
+	<script type="module" src="example.js"></script>
+</head>
+<body>
+
+<h1>Example application</h1>
+
+<div>
+	<h2>/api/values/anon</h2>
+	<input type="button" value="Get values" id="getAnon">
+	<textarea id="anonOutput"></textarea>
+</div>
+
+<div>
+	<h2>/api/values/secure</h2>
+	<input type="button" value="Get values" id="getSecure">
+	<textarea id="secureOutput"></textarea>
+</div>
+
+<div>
+	<h2>/api/login/authenticate</h2>
+	<label>Identity <input type="text" id="identity" name="identity" value="admin"></label>
+	<label>Secret <input type="password" id="secret" name="secret" value="secret_code"></label>
+	<input type="button" value="Get credentials" id="getCredentials">
+	<input type="button" value="Forget credentials" id="removeCredentials">
+	<textarea id="errorOutput"></textarea>
+</div>
+
+</body>
+</html>
