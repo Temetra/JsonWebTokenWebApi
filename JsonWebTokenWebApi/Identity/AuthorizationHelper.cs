@@ -66,7 +66,8 @@ namespace JsonWebTokenWebApi.Identity
 			{
 				Secure = true,
 				HttpOnly = true,
-				MaxAge = TimeSpan.FromMinutes(TokenLifetime)
+				MaxAge = TimeSpan.FromMinutes(TokenLifetime),
+				Path = "/"
 			};
 			message.Headers.AddCookies(new[] { cookie });
 
